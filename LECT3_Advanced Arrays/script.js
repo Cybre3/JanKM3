@@ -92,3 +92,4 @@ main([
 //   }
 
 let numsArr = [1, 2, 2, 4, 5, 6];
+console.log(numsArr.sort((a, b) => b - a));
