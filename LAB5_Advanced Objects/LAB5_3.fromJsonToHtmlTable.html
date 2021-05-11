@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>FromJSONToHTMLTable</title>
+        <style>
+            table,
+            th {
+                border: groove;
+                border-collapse: collapse;
+            }
+            td {
+                border: 1px solid black;
+            }
+            td,
+            th {
+                padding: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="wrapper"></div>
+        <script>
+            function main(arrJSON) {
+                const inputJSON = JSON.parse(arrJSON);
+                let output = ['<table>'];
+                let headerArr = ['  <tr>'];
+                const headerLabels = Object.keys(inputJSON[0]);
+
+                for (let eachLabel of headerLabels) {
+                    headerArr.push(`<th>${eachLabel}</th>`);
+                }
+
+                headerArr.push('</tr>');
+                output.push(headerArr.join(''));
+
+                for (let eachObj of inputJSON) {
+                    let eachDataRowArr = ['  <tr>'];
+                    for (let values of Object.values(eachObj)) {
+                        eachDataRowArr.push(`<td>${encodeURIComponent(values)}</td>`);
+                    }
+                    output.push(eachDataRowArr.join(''));
+                }
+
+                output.push('</table>');
+
+                return output.join('\n');
+            }
+            window.onload = function () {
+                let container = document.getElementById('wrapper');
+                container.innerHTML = main([
+                    '[{"Name":"Tomatoes & Chips","Price":2.35},{"Name":"J&B Chocolate","Price":0.96}]',
+                ]);
+            };
+        </script>
+    </body>
+</html>
