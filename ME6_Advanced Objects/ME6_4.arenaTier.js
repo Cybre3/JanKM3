@@ -19,10 +19,10 @@ function main(gladiatorPoolArr) {
             gladiatorPoolObj[gladiator][technique] += skill;
         }
 
-        heroInfo = tempArr.shift().split(' -> ');
+    heroInfo = tempArr.shift().split(' -> '); 
     }
 
-    console.log(gladiatorPoolObj);
+    console.log(gladiatorPoolObj); 
 
 }
 
