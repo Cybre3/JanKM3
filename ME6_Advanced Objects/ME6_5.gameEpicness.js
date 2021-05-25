@@ -64,9 +64,7 @@ class Kingdom {
         console.log(
             `/\general: ${this.general}\n---army: ${this.army}\n---wins: ${this.wins}---losses: ${this.losses}`
         );
-    }
-
-    
+    }    
 }
 
 let allKingdoms = new Map();
@@ -74,7 +72,10 @@ let allKingdoms = new Map();
 function main(kingsArrObj, listedBattleArr) {
     allKingdoms.clear();
     populateMap(kingsArrObj);
-    console.log(allKingdoms);
+    // console.log(allKingdoms);
+    for(let battle of listedBattleArr){
+        const [kin]
+    }
 }
 
 function populateMap(arr) {
@@ -94,6 +95,7 @@ function populateMap(arr) {
         }
     }
 }
+
 
 main(
     [
