@@ -47,55 +47,158 @@ second ​argument
 Print the winning kingdom and ​sort ​the generals by their ​armies in​​descending ​order
 */
 
-class Kingdom {
-    constructor(kingdom, general, army, wins, losses) {
-        this.kingdom = kingdom;
+class General {
+    constructor(general, army, wins, losses) {
         this.general = general;
         this.army = +army;
         this.wins = +wins;
         this.losses = +losses;
     }
 
-    winner() {
-        console.log(`Winner: ${this.kingdom}\n${this.general}`);
+    format() {
+        return `\/\\general: ${this.general}\n---army: ${this.army}\n---wins: ${this.wins}\n---losses: ${this.losses}`;
     }
-
-    general() {
-        console.log(
-            `/\general: ${this.general}\n---army: ${this.army}\n---wins: ${this.wins}---losses: ${this.losses}`
-        );
-    }    
 }
 
-let allKingdoms = new Map();
+let allKingdoms = {};
 
 function main(kingsArrObj, listedBattleArr) {
-    allKingdoms.clear();
+    allKingdoms = {};
     populateMap(kingsArrObj);
-    // console.log(allKingdoms);
-    for(let battle of listedBattleArr){
-        const [kin]
-    }
+    battleArmies(listedBattleArr);
+    // {
+    //     'Maiden Way': Map(4) {
+    //       'kingWins' => 1,
+    //       'kingLosses' => 2,
+    //       'Merek' => { army: 4050, genWins: 0, genLosses: 2 },'Berinon' => { army: 110000, genWins: 1, genLosses:
+    //   0 }
+    //     },
+    //     Stonegate: Map(4) {
+    //       'kingWins' => 3,
+    //       'kingLosses' => 1,
+    //       'Ulric' => { army: 5336, genWins: 2, genLosses: 1 },'Doran' => { army: 77000, genWins: 1, genLosses: 0 }  },
+    //     YorkenShire: Map(3) {
+    //       'kingWins' => 0,
+    //       'kingLosses' => 1,
+    //       'Quinn' => { army: 1800, genWins: 0, genLosses: 1 }
+    //     }
+    // }
+
+    let winnerObj = mostWins(allKingdoms);
+    // console.log(winnerObj.generals);
+    printWinner(winnerObj);
 }
 
 function populateMap(arr) {
     for (let kingsObj of arr) {
         let [kingdom, general, armySize] = Object.values(kingsObj);
 
-        if (!allKingdoms.has(kingdom)) {
-            allKingdoms.set(kingdom, new Map());
+        if (!allKingdoms[kingdom]) {
+            allKingdoms[kingdom] = new Map();
         }
 
-        if (!allKingdoms.get(kingdom).has(general)) {
-            allKingdoms.get(kingdom).set(general, armySize);
-        } else if (allKingdoms.get(kingdom).has(general)) {
-            allKingdoms
-                .get(kingdom)
-                .set(general, allKingdoms.get(kingdom).get(general) + armySize);
+        if (!allKingdoms[kingdom].has(general)) {
+            allKingdoms[kingdom].set("kingWins", 0);
+            allKingdoms[kingdom].set("kingLosses", 0);
+            allKingdoms[kingdom].set(general, {
+                army: armySize,
+                genWins: 0,
+                genLosses: 0,
+            });
+        } else {
+            allKingdoms[kingdom].get(general)["army"] += armySize;
         }
     }
 }
 
+function battleArmies(arr) {
+    for (let battle of arr) {
+        const [attackKing, attackGen, defKing, defGen] = battle;
+        const aGeneral = allKingdoms[attackKing].get(attackGen);
+        const dGeneral = allKingdoms[defKing].get(defGen);
+
+        if (attackKing !== defKing && aGeneral.army > dGeneral.army) {
+            aGeneral.genWins++;
+            dGeneral.genLosses++;
+            allKingdoms[attackKing].set(
+                "kingWins",
+                allKingdoms[attackKing].get("kingWins") + 1
+            );
+            allKingdoms[defKing].set(
+                "kingLosses",
+                allKingdoms[defKing].get("kingLosses") + 1
+            );
+            aGeneral.army = Math.floor(aGeneral.army * 1.1);
+            dGeneral.army = Math.floor(dGeneral.army * 0.9);
+        } else if (attackKing !== defKing && aGeneral.army < dGeneral.army) {
+            dGeneral.genWins++;
+            aGeneral.genLosses++;
+            allKingdoms[defKing].set(
+                "kingWins",
+                allKingdoms[defKing].get("kingWins") + 1
+            );
+            allKingdoms[attackKing].set(
+                "kingLosses",
+                allKingdoms[attackKing].get("kingLosses") + 1
+            );
+            dGeneral.army = Math.floor(dGeneral.army * 1.1);
+            aGeneral.army = Math.floor(aGeneral.army * 0.9);
+        }
+    }
+}
+
+function mostWins(obj) {
+    let allKingdomsArr = Object.entries(obj);
+
+    allKingdomsArr.forEach((kingdom, index) => {
+        kingdom.forEach((kingInfo, index) => {
+            if (index % 2 !== 0) {
+                kingInfo = Array.from(kingInfo);
+                kingdom.splice(1, 1, kingInfo);
+                kingInfo.forEach((thing, index) => {
+                    if (typeof thing[1] === "object") {
+                        thing[1] = Object.entries(thing[1]);
+                    }
+                });
+            }
+        });
+        allKingdomsArr.splice(index, 1, kingdom);
+    });
+
+    allKingdomsArr.sort((a, b) => b[1][0][1] - a[1][0][1]);
+
+    // console.log(allKingdomsArr[0]);
+
+    let winnerObj = {};
+
+    winnerObj.kingdom = allKingdomsArr[0][0];
+    winnerObj.generals = [];
+
+    allKingdomsArr[0][1].forEach((infoPiece, index) => {
+        if (index > 1) {
+            // console.log(infoPiece);
+            winnerObj.generals.push(infoPiece);
+        }
+    });
+
+    winnerObj.generals.sort(
+        (a, b) =>
+            (b[1][1][1] - a[1][1][1] && a[1][2][1] - b[1][2][1]) ||
+            a[0].localeCompare(b[0])
+    );
+
+    return winnerObj;
+}
+
+function printWinner(obj) {
+    console.log(`Winner: ${obj.kingdom}`);
+    obj.generals.forEach((general) => {
+        const [genName, genArray] = general;
+        const [army, wins, loss] = genArray;
+        const eachGen = new General(genName, army[1], wins[1], loss[1]);
+        console.log(eachGen.format());
+    });
+}
 
 main(
     [
