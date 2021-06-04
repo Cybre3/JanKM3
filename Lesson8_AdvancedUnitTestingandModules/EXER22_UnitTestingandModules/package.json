@@ -1,0 +1,19 @@
+{
+  "name": "EXER22_UnitTestingandModules",
+  "version": "1.0.0",
+  "main": "EXER22_2.evenOrOdd.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "mocha": "^8.4.0"
+  }
+}
